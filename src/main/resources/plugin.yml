@@ -1,0 +1,6 @@
+name: VillageBuilder
+version: '1.21-1.0.0'
+main: org.example.villageBuilder.Main
+api-version: '1.21'
+authors: [ UiMi17, S4r3ss ]
+website: https://discord.gg/sRy72EhjR8
