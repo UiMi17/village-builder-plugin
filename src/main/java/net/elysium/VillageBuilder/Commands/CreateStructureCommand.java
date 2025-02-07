@@ -1,27 +1,23 @@
 package net.elysium.VillageBuilder.Commands;
 
+import net.elysium.VillageBuilder.Main;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.io.IOException;
 
 public class CreateStructureCommand implements CommandExecutor {
     private final SelectionManager selectionManager;
     private final PositionSelectionCommand positionSelectionCommand;
-    private final File dataFile;
-    private final YamlConfiguration dataConfig;
+    private final Main plugin;
 
-    public CreateStructureCommand(SelectionManager selectionManager, PositionSelectionCommand positionSelectionCommand, File pluginDataFolder) {
+    public CreateStructureCommand(SelectionManager selectionManager, PositionSelectionCommand positionSelectionCommand, Main plugin) {
         this.selectionManager = selectionManager;
         this.positionSelectionCommand = positionSelectionCommand;
-        this.dataFile = new File(pluginDataFolder, "data.yml");
-        this.dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+        this.plugin = plugin;
     }
 
     @Override
@@ -48,21 +44,19 @@ public class CreateStructureCommand implements CommandExecutor {
         return true;
     }
 
-
     private void saveStructureData(Player player, String structureName, Location pos1, Location pos2) {
-        dataConfig.set("structures." + structureName + ".pos1.x", pos1.getBlockX());
-        dataConfig.set("structures." + structureName + ".pos1.y", pos1.getBlockY());
-        dataConfig.set("structures." + structureName + ".pos1.z", pos1.getBlockZ());
-        dataConfig.set("structures." + structureName + ".pos2.x", pos2.getBlockX());
-        dataConfig.set("structures." + structureName + ".pos2.y", pos2.getBlockY());
-        dataConfig.set("structures." + structureName + ".pos2.z", pos2.getBlockZ());
+        ConfigurationSection structuresSection = plugin.getConfig().createSection("structures." + structureName);
 
-        try {
-            dataConfig.save(dataFile);
-            selectionManager.clearSelection(player);
-            positionSelectionCommand.cancelParticleTask(player);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        structuresSection.set("pos1.x", pos1.getBlockX());
+        structuresSection.set("pos1.y", pos1.getBlockY());
+        structuresSection.set("pos1.z", pos1.getBlockZ());
+        structuresSection.set("pos2.x", pos2.getBlockX());
+        structuresSection.set("pos2.y", pos2.getBlockY());
+        structuresSection.set("pos2.z", pos2.getBlockZ());
+
+        plugin.saveConfig();
+
+        selectionManager.clearSelection(player);
+        positionSelectionCommand.cancelParticleTask(player);
     }
 }
