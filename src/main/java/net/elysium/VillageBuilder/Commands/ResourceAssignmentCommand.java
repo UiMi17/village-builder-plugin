@@ -1,26 +1,20 @@
 package net.elysium.VillageBuilder.Commands;
 
+import net.elysium.VillageBuilder.Main;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class ResourceAssignmentCommand implements CommandExecutor {
-    private final FileConfiguration config;
-    private final File dataFile;
+    private final Main plugin;
 
-    public ResourceAssignmentCommand() {
-        this.dataFile = new File("plugins/VillageBuilder", "data.yml");
-        this.config = YamlConfiguration.loadConfiguration(dataFile);
+    public ResourceAssignmentCommand(Main plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -43,7 +37,7 @@ public class ResourceAssignmentCommand implements CommandExecutor {
         }
 
         String resourcePath = "structures." + structureName + ".stages." + stageNumber;
-        if (!Objects.requireNonNull(config.getString(resourcePath)).contains(resourcePath)) {
+        if (plugin.getConfig().getConfigurationSection(resourcePath) == null) {
             player.sendMessage("Стадія або структура не знайдені.");
             return false;
         }
@@ -51,18 +45,10 @@ public class ResourceAssignmentCommand implements CommandExecutor {
         String[] resourceInputs = Arrays.copyOfRange(args, 2, args.length);
         List<String> resources = Arrays.asList(resourceInputs);
 
-        config.set(resourcePath + ".resources", resources);
-        saveData();
+        plugin.getConfig().set(resourcePath + ".resources", resources);
+        plugin.saveConfig();
 
         player.sendMessage("Ресурси " + resources + " додані до стадії " + stageNumber + " структури '" + structureName + "'.");
         return true;
-    }
-
-    private void saveData() {
-        try {
-            config.save(dataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

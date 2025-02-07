@@ -1,24 +1,19 @@
 package net.elysium.VillageBuilder.Commands;
 
+import net.elysium.VillageBuilder.Main;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
-
 public class StructureManager {
-    private final File dataFile;
-    private final YamlConfiguration config;
+    private final Main plugin;
     private final SelectionManager selectionManager;
     private final PositionSelectionCommand positionSelectionCommand;
 
-    public StructureManager(SelectionManager selectionManager, PositionSelectionCommand positionSelectionCommand) {
+    public StructureManager(SelectionManager selectionManager, PositionSelectionCommand positionSelectionCommand, Main plugin) {
         this.selectionManager = selectionManager;
         this.positionSelectionCommand = positionSelectionCommand;
-        this.dataFile = new File("plugins/VillageBuilder", "data.yml");
-        this.config = YamlConfiguration.loadConfiguration(dataFile);
+        this.plugin = plugin;
     }
 
     public void addStructureStage(Player player, String stageName, String structureName) {
@@ -28,42 +23,37 @@ public class StructureManager {
             return;
         }
 
-        String structurePath = "structures." + structureName;
-        if (!Objects.requireNonNull(config.getString(structurePath)).contains(structurePath)) {
-            player.sendMessage("Структура '" + structureName + "' не знайдена.");
-            return;
-        }
+            if (!plugin.getConfig().isConfigurationSection("structures." + structureName)) {
+                player.sendMessage("Структура '" + structureName + "' не знайдена.");
+                return;
+            }
 
-        int nextStageNumber = 0;
-        String path = config.getString(structurePath + ".stages");
-        if (path != null) {
-            nextStageNumber = Objects.requireNonNull(config.getConfigurationSection(structurePath + ".stages")).getKeys(false).size();
-        }
+            ConfigurationSection structureSection = plugin.getConfig().getConfigurationSection("structures." + structureName);
 
-        String stagePath = structurePath + ".stages." + nextStageNumber;
+        assert structureSection != null;
+        ConfigurationSection stagesSection = structureSection.getConfigurationSection("stages");
+            if (stagesSection == null) {
+                stagesSection = structureSection.createSection("stages");
+            }
 
-        saveLocation(stagePath + ".pos1", selection[0]);
-        saveLocation(stagePath + ".pos2", selection[1]);
+            int nextStageNumber = stagesSection.getKeys(false).size();
+            String stagePath = "structures." + structureName + ".stages." + nextStageNumber;
 
-        config.set(stagePath + ".name", stageName);
+            saveLocation(stagePath + ".pos1", selection[0]);
+            saveLocation(stagePath + ".pos2", selection[1]);
+            plugin.getConfig().set(stagePath + ".name", stageName);
 
-        saveData();
-        selectionManager.clearSelection(player);
-        positionSelectionCommand.cancelParticleTask(player);
-        player.sendMessage("Стадія '" + stageName + "' додана до структури '" + structureName + "' з порядковим номером " + nextStageNumber + ".");
+            plugin.saveConfig();
+
+            selectionManager.clearSelection(player);
+            positionSelectionCommand.cancelParticleTask(player);
+
+            player.sendMessage("Стадія '" + stageName + "' додана до структури '" + structureName + "' з порядковим номером " + nextStageNumber + ".");
     }
 
     private void saveLocation(String path, Location location) {
-        config.set(path + ".x", location.getBlockX());
-        config.set(path + ".y", location.getBlockY());
-        config.set(path + ".z", location.getBlockZ());
-    }
-
-    private void saveData() {
-        try {
-            config.save(dataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        plugin.getConfig().set(path + ".x", location.getBlockX());
+        plugin.getConfig().set(path + ".y", location.getBlockY());
+        plugin.getConfig().set(path + ".z", location.getBlockZ());
     }
 }
