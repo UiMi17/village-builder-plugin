@@ -50,12 +50,12 @@ public class CreateStructureCommand implements CommandExecutor {
 
 
     private void saveStructureData(Player player, String structureName, Location pos1, Location pos2) {
-        dataConfig.set(structureName + ".pos1.x", pos1.getBlockX());
-        dataConfig.set(structureName + ".pos1.y", pos1.getBlockY());
-        dataConfig.set(structureName + ".pos1.z", pos1.getBlockZ());
-        dataConfig.set(structureName + ".pos2.x", pos2.getBlockX());
-        dataConfig.set(structureName + ".pos2.y", pos2.getBlockY());
-        dataConfig.set(structureName + ".pos2.z", pos2.getBlockZ());
+        dataConfig.set("structures." + structureName + ".pos1.x", pos1.getBlockX());
+        dataConfig.set("structures." + structureName + ".pos1.y", pos1.getBlockY());
+        dataConfig.set("structures." + structureName + ".pos1.z", pos1.getBlockZ());
+        dataConfig.set("structures." + structureName + ".pos2.x", pos2.getBlockX());
+        dataConfig.set("structures." + structureName + ".pos2.y", pos2.getBlockY());
+        dataConfig.set("structures." + structureName + ".pos2.z", pos2.getBlockZ());
 
         try {
             dataConfig.save(dataFile);
