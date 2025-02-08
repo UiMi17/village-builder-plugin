@@ -66,7 +66,7 @@ public final class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("pos")).setExecutor(positionSelectionCommand);
         Objects.requireNonNull(getCommand("create-structure")).setExecutor(new CreateStructureCommand(selectionManager, positionSelectionCommand, this));
         Objects.requireNonNull(getCommand("assign-stage")).setExecutor(new AssignStageCommand(structureManager));
-        Objects.requireNonNull(getCommand("assign-resources")).setExecutor(new ResourceAssignmentCommand(this));
+        Objects.requireNonNull(getCommand("assign-resources")).setExecutor(new AssignResourcesCommand(this));
         Objects.requireNonNull(getCommand("initialize-structure")).setExecutor(new InitializeStructureCommand(this));
     }
 }

@@ -3,6 +3,7 @@ version: '1.21-1.0.0'
 main: net.elysium.VillageBuilder.Main
 authors: [ UiMi17, S4r3ss ]
 website: https://discord.gg/sRy72EhjR8
+api-version: '1.20'
 commands:
   pos:
     description: "Команда для виділення областей структур та стадій"
