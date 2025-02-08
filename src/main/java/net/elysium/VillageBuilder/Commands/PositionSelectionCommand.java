@@ -63,8 +63,8 @@ public class PositionSelectionCommand implements CommandExecutor {
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
+        int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
-        int minY = 0;
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
