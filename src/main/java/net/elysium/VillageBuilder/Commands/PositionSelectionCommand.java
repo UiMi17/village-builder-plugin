@@ -26,6 +26,11 @@ public class PositionSelectionCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) return false;
 
+        if (args.length == 0) {
+            player.sendMessage("Використання: /pos [індекс_позиції]");
+            return false;
+        }
+
         if (args[0].equalsIgnoreCase("cancel")) {
             cancelParticleTask(player);
             selectionManager.clearSelection(player);
