@@ -2,8 +2,9 @@ package net.elysium.VillageBuilder.Commands;
 
 import net.elysium.VillageBuilder.Main;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -104,16 +105,20 @@ public class InitializeStructureCommand implements CommandExecutor {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Location stageLocation = new Location(world, x, y, z);
-                    Material blockMaterial = stageLocation.getBlock().getType();
+                    Block stageBlock = stageLocation.getBlock();
 
                     int targetX = x + structureXOffset;
                     int targetY = y + structureYOffset;
                     int targetZ = z + structureZOffset;
 
                     Location targetLocation = new Location(world, targetX, targetY, targetZ);
-                    targetLocation.getBlock().setType(blockMaterial);
+                    Block targetBlock = targetLocation.getBlock();
+
+                    BlockData blockData = stageBlock.getBlockData();
+                    targetBlock.setBlockData(blockData, false);
                 }
             }
         }
+
     }
 }
