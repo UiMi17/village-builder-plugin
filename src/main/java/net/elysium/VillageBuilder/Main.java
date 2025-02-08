@@ -33,6 +33,15 @@ public final class Main extends JavaPlugin {
         saveConfig();
     }
 
+    private void registerCommands() {
+        Objects.requireNonNull(getCommand("pos")).setExecutor(positionSelectionCommand);
+        Objects.requireNonNull(getCommand("create-structure")).setExecutor(new CreateStructureCommand(selectionManager, positionSelectionCommand, this));
+        Objects.requireNonNull(getCommand("assign-stage")).setExecutor(new AssignStageCommand(structureManager));
+        Objects.requireNonNull(getCommand("assign-resources")).setExecutor(new AssignResourcesCommand(this));
+        Objects.requireNonNull(getCommand("initialize-structure")).setExecutor(new InitializeStructureCommand(this));
+        Objects.requireNonNull(getCommand("add-resources")).setExecutor(new AddResourcesCommand(this));
+    }
+
     public void reloadConfig() {
         if (configFile == null) {
             configFile = new File(getDataFolder(), "data.yml");
@@ -60,13 +69,5 @@ public final class Main extends JavaPlugin {
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
         }
-    }
-
-    private void registerCommands() {
-        Objects.requireNonNull(getCommand("pos")).setExecutor(positionSelectionCommand);
-        Objects.requireNonNull(getCommand("create-structure")).setExecutor(new CreateStructureCommand(selectionManager, positionSelectionCommand, this));
-        Objects.requireNonNull(getCommand("assign-stage")).setExecutor(new AssignStageCommand(structureManager));
-        Objects.requireNonNull(getCommand("assign-resources")).setExecutor(new AssignResourcesCommand(this));
-        Objects.requireNonNull(getCommand("initialize-structure")).setExecutor(new InitializeStructureCommand(this));
     }
 }
