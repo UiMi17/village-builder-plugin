@@ -1,6 +1,7 @@
 package net.elysium.VillageBuilder.Commands;
 
 import net.elysium.VillageBuilder.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -8,30 +9,27 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class InitializeStructureCommand implements CommandExecutor {
     Main plugin;
-    
+
     public InitializeStructureCommand(Main plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (!(sender instanceof Player player)) return false;
-
         if (args.length < 1) {
-            player.sendMessage("Використання: /initialize-structure <назва_структури> [номер_стадії]");
+            sender.sendMessage("Використання: /initialize-structure <назва_структури> [номер_стадії]");
             return false;
         }
 
         String structureName = args[0];
         String structurePath = "structures." + structureName;
-        String structure = plugin.getConfig().getString(structurePath);
-        if (structure == null) {
-            player.sendMessage("Структура '" + structureName + "' не знайдена.");
+
+        if (!plugin.getConfig().contains(structurePath)) {
+            sender.sendMessage("Структура '" + structureName + "' не знайдена.");
             return false;
         }
 
@@ -40,36 +38,35 @@ public class InitializeStructureCommand implements CommandExecutor {
             try {
                 stageNumber = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                player.sendMessage("Номер стадії повинен бути числом.");
+                sender.sendMessage("Номер стадії повинен бути числом.");
                 return false;
             }
         }
 
         String stagePath = structurePath + ".stages." + stageNumber;
         if (!plugin.getConfig().contains(stagePath)) {
-            player.sendMessage("Стадія з номером " + stageNumber + " не знайдена.");
+            sender.sendMessage("Стадія з номером " + stageNumber + " не знайдена.");
             return false;
         }
 
-        Location stagePos1 = getLocationFromConfig(stagePath + ".pos1", player.getWorld());
-        Location stagePos2 = getLocationFromConfig(stagePath + ".pos2", player.getWorld());
-
-        if (stagePos1 == null || stagePos2 == null) {
-            player.sendMessage("Некоректні координати для стадії.");
+        World world = Bukkit.getWorlds().get(0);
+        if (world == null) {
+            sender.sendMessage("Світ за замовчуванням не знайдено.");
             return false;
         }
 
-        Location structurePos1 = getLocationFromConfig(structurePath + ".pos1", player.getWorld());
-        Location structurePos2 = getLocationFromConfig(structurePath + ".pos2", player.getWorld());
+        Location stagePos1 = getLocationFromConfig(stagePath + ".pos1", world);
+        Location stagePos2 = getLocationFromConfig(stagePath + ".pos2", world);
+        Location structurePos1 = getLocationFromConfig(structurePath + ".pos1", world);
 
-        if (structurePos1 == null || structurePos2 == null) {
-            player.sendMessage("Некоректні координати для структури.");
+        if (stagePos1 == null || stagePos2 == null || structurePos1 == null) {
+            sender.sendMessage("Некоректні координати для стадії або структури.");
             return false;
         }
 
-        copyStageToStructure(stagePos1, stagePos2, structurePos1, player);
+        copyStageToStructure(stagePos1, stagePos2, structurePos1, sender, world);
 
-        player.sendMessage("Структура '" + structureName + "' успішно ініціалізована стадією " + stageNumber + ".");
+        sender.sendMessage("Структура '" + structureName + "' успішно ініціалізована стадією " + stageNumber + ".");
         return true;
     }
 
@@ -81,7 +78,7 @@ public class InitializeStructureCommand implements CommandExecutor {
         return new Location(world, x, y, z);
     }
 
-    private void copyStageToStructure(Location stagePos1, Location stagePos2, Location structurePos1, Player player) {
+    private void copyStageToStructure(Location stagePos1, Location stagePos2, Location structurePos1, CommandSender sender, World world) {
         int minX = Math.min(stagePos1.getBlockX(), stagePos2.getBlockX());
         int minY = Math.min(stagePos1.getBlockY(), stagePos2.getBlockY());
         int minZ = Math.min(stagePos1.getBlockZ(), stagePos2.getBlockZ());
@@ -93,13 +90,6 @@ public class InitializeStructureCommand implements CommandExecutor {
         int structureXOffset = structurePos1.getBlockX() - minX;
         int structureYOffset = structurePos1.getBlockY() - minY;
         int structureZOffset = structurePos1.getBlockZ() - minZ;
-
-        World world = stagePos1.getWorld();
-
-        if (world == null) {
-            player.sendMessage("Світ для копіювання не знайдено.");
-            return;
-        }
 
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
@@ -119,6 +109,5 @@ public class InitializeStructureCommand implements CommandExecutor {
                 }
             }
         }
-
     }
 }
