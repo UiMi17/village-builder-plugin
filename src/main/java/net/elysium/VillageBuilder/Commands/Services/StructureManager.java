@@ -1,5 +1,6 @@
-package net.elysium.VillageBuilder.Commands;
+package net.elysium.VillageBuilder.Commands.Services;
 
+import net.elysium.VillageBuilder.Commands.PositionSelectionCommand;
 import net.elysium.VillageBuilder.Main;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,6 +42,7 @@ public class StructureManager {
 
             saveLocation(stagePath + ".pos1", selection[0]);
             saveLocation(stagePath + ".pos2", selection[1]);
+            plugin.getConfig().set(stagePath + ".isCurrentStage", false);
             plugin.getConfig().set(stagePath + ".name", stageName);
 
             plugin.saveConfig();

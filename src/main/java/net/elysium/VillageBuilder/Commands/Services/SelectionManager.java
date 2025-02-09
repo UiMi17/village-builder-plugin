@@ -1,4 +1,4 @@
-package net.elysium.VillageBuilder.Commands;
+package net.elysium.VillageBuilder.Commands.Services;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

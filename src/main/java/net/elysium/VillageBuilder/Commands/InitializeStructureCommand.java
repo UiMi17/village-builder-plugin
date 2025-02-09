@@ -9,6 +9,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 public class InitializeStructureCommand implements CommandExecutor {
@@ -63,6 +64,16 @@ public class InitializeStructureCommand implements CommandExecutor {
             sender.sendMessage("Некоректні координати для стадії або структури.");
             return false;
         }
+
+        ConfigurationSection structureSection = plugin.getConfig().getConfigurationSection("structures." + structureName);
+        assert structureSection != null;
+        int totalStagesCount = structureSection.getKeys(false).size() - 1;
+        for (int i = 0; i < totalStagesCount; i++) {
+            structureSection.set("stages." + i + ".isCurrentStage", false);
+        }
+
+        plugin.getConfig().set(stagePath + ".isCurrentStage", true);
+        plugin.saveConfig();
 
         copyStageToStructure(stagePos1, stagePos2, structurePos1, sender, world);
 

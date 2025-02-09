@@ -1,6 +1,8 @@
 package net.elysium.VillageBuilder;
 
 import net.elysium.VillageBuilder.Commands.*;
+import net.elysium.VillageBuilder.Commands.Services.SelectionManager;
+import net.elysium.VillageBuilder.Commands.Services.StructureManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,6 +42,7 @@ public final class Main extends JavaPlugin {
         Objects.requireNonNull(getCommand("assign-resources")).setExecutor(new AssignResourcesCommand(this));
         Objects.requireNonNull(getCommand("initialize-structure")).setExecutor(new InitializeStructureCommand(this));
         Objects.requireNonNull(getCommand("add-resources")).setExecutor(new AddResourcesCommand(this));
+        Objects.requireNonNull(getCommand("scoreboard")).setExecutor(new InitializeScoreboardCommand(this));
     }
 
     public void reloadConfig() {
